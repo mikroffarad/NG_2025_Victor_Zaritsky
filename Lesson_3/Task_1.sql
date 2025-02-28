@@ -96,6 +96,7 @@ END
 GO
 
 -- Call procedure to create project
+-- You should run this procedure several times to test GetPaginatedProjects procedure (view step 7)
 -- CreateProject 1
 EXEC CreateProject
 	@Name = 'AI Startup',
@@ -255,3 +256,112 @@ GO
 -- Check non-exist project
 EXEC GetProjectInfo @ProjectId = 99;
 GO
+
+-- Step 6: GetPaginatedProjects procedure
+CREATE PROCEDURE GetPaginatedProjects
+    @PageNumber INT,
+    @PageSize INT,
+    @ProjectName NVARCHAR(100) = NULL,
+    @CategoryId INT = NULL,
+    @StartDate DATETIME = NULL,
+    @EndDate DATETIME = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+	-- Define offset
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+
+	-- Get filtered projects with pagination
+    SELECT 
+        P.Id, 
+        P.Name, 
+        P.Description, 
+        P.CreationDate, 
+        U.Name + ' ' + U.SecondName AS Creator, 
+        C.Description AS Category,
+        (SELECT COUNT(*) FROM Vote V WHERE V.ProjectId = P.Id) AS VotesCount
+    FROM Project P
+    JOIN Users U ON P.CreatorId = U.Id
+    JOIN Category C ON P.CategoryId = C.Id
+    WHERE 
+        (@ProjectName IS NULL OR P.Name LIKE '%' + @ProjectName + '%')
+        AND (@CategoryId IS NULL OR P.CategoryId = @CategoryId)
+        AND (@StartDate IS NULL OR P.CreationDate >= @StartDate)
+        AND (@EndDate IS NULL OR P.CreationDate <= @EndDate)
+    ORDER BY P.CreationDate DESC
+    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
+END;
+GO
+
+-- Make sure you added enough projects to test this procedure (view Step 3)
+-- Get first page which contains 5 projects
+EXEC GetPaginatedProjects @PageNumber = 1, @PageSize = 5;
+GO
+-- Get third page which contains 3 projects about Technology (1)
+EXEC GetPaginatedProjects @PageNumber = 3, @PageSize = 3, @CategoryId = 1;
+GO
+-- Get second page which contains 10 projects made after February 28, 2025
+EXEC GetPaginatedProjects @PageNumber = 2, @PageSize = 10, @StartDate = '2025-02-28';
+GO
+
+-- Step 7: AddVote procedure
+CREATE PROCEDURE AddVote
+    @UserId INT,
+    @ProjectId INT
+AS
+BEGIN
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        -- Check if user exists
+        IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = @UserId)
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Check if project exists
+        IF NOT EXISTS (SELECT 1 FROM Project WHERE Id = @ProjectId)
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Check if user already voted
+        IF EXISTS (SELECT 1 FROM Vote WHERE UserId = @UserId AND ProjectId = @ProjectId)
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Add vote
+        INSERT INTO Vote (UserId, ProjectId)
+        VALUES (@UserId, @ProjectId);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;
+GO
+
+-- User 1 adds vote to Project 1 first time
+EXEC AddVote @UserId = 1, @ProjectId = 1;
+GO
+-- User 1 adds vote to Project 1 first time (it fails)
+EXEC AddVote @UserId = 1, @ProjectId = 1;
+GO
+-- Non-exist user adds vote to Project 1 (it fails)
+EXEC AddVote @UserId = 999, @ProjectId = 1;
+GO
+-- User 1 adds vote to non-exist project (it fails)
+EXEC AddVote @UserId = 1, @ProjectId = 999;
+GO
+
+-- View Vote table
+SELECT * from Vote;
+
+-- Make sure vote is added
+EXEC GetProjectInfo @ProjectId = 1;
