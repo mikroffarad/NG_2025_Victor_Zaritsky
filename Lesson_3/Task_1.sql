@@ -68,17 +68,21 @@ AS
 BEGIN
     BEGIN TRANSACTION;
     BEGIN TRY
-        -- Check if the field with the same name and description exists
-        IF EXISTS (
-            SELECT 1 FROM Project 
-            WHERE Name = @Name AND Description = @Description
-        )
+		-- Check if user not exists
+        IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = @CreatorId)
         BEGIN
             ROLLBACK TRANSACTION;
             RETURN;
         END
 
-        -- Inserting new unique project
+		-- Check if category not exists
+        IF NOT EXISTS (SELECT 1 FROM Category WHERE Id = @CategoryId)
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Creating new project
         INSERT INTO Project (Name, Description, CreationDate, CreatorId, CategoryId)
         VALUES (@Name, @Description, GETDATE(), @CreatorId, @CategoryId);
 
@@ -106,16 +110,21 @@ EXEC CreateProject
     @CreatorId = 2,
     @CategoryId = 2 -- Education
 GO
--- CreateProject 3 (shouldn't be created because project with the same name and description already exists)
-DECLARE @ProjectId INT;
-EXEC CreateProject
-	@Name = 'AI Startup',
-	@Description = 'An innovative AI project',
-	@CreatorId = 1,
-	@CategoryId = 1 -- Technology
+-- CreateProject 3 (shouldn't be create because of non-exist user)
+EXEC CreateProject 
+    @Name = 'Online Learning Platform',
+    @Description = 'An interactive platform for online education',
+    @CreatorId = 999, -- User not exists
+    @CategoryId = 2 -- Education
 GO
--- CreateProject 4
-DECLARE @ProjectId INT;
+-- CreateProject 4 (shouldn't be create because of non-exist category)
+EXEC CreateProject 
+    @Name = 'Online Learning Platform',
+    @Description = 'An interactive platform for online education',
+    @CreatorId = 2, 
+    @CategoryId = 999 -- Category not exists
+GO
+-- CreateProject 5
 EXEC CreateProject 
     @Name = 'AI-Powered Diagnosis Tool',
     @Description = 'An AI-based tool to assist doctors in diagnostics',
@@ -150,7 +159,7 @@ BEGIN
             RETURN;
         END
 
-        -- Creating comment
+        -- Creating new comment
         INSERT INTO Comment (Text, Date, UserId, ProjectId)
         VALUES (@Text, GETDATE(), @UserId, @ProjectId);
 
@@ -197,6 +206,6 @@ EXEC CreateComment
     @ProjectId = 3;
 GO
 
--- View Project table, there should be 3 comments
+-- View Comment table, there should be 3 comments
 select * from Comment
 GO
