@@ -209,3 +209,49 @@ GO
 -- View Comment table, there should be 3 comments
 select * from Comment
 GO
+
+-- Step 5: GetProjectInfo procedure
+CREATE PROCEDURE GetProjectInfo
+    @ProjectId INT
+AS
+BEGIN
+    -- Check if project not exists
+    IF NOT EXISTS (SELECT 1 FROM Project WHERE Id = @ProjectId)
+    BEGIN
+        RETURN;
+    END
+
+    -- Project info
+    SELECT 
+        P.Id, 
+        P.Name, 
+        P.Description, 
+        P.CreationDate, 
+        U.Name + ' ' + U.SecondName AS Creator, 
+        C.Description AS Category, 
+        (SELECT COUNT(*) FROM Vote V WHERE V.ProjectId = P.Id) AS VotesCount
+    FROM Project P
+    JOIN Users U ON P.CreatorId = U.Id
+    JOIN Category C ON P.CategoryId = C.Id
+    WHERE P.Id = @ProjectId;
+
+    -- Comments info
+    SELECT 
+        C.Id, 
+        C.Text, 
+        C.Date, 
+        U.Name + ' ' + U.SecondName AS UserName
+    FROM Comment C
+    JOIN Users U ON C.UserId = U.Id
+    WHERE C.ProjectId = @ProjectId
+    ORDER BY C.Date ASC;
+END
+GO
+
+-- Check projects info by their IDs (1-3)
+EXEC GetProjectInfo @ProjectId = 2;
+GO
+
+-- Check non-exist project
+EXEC GetProjectInfo @ProjectId = 99;
+GO
