@@ -1,61 +1,70 @@
-﻿-- Step 1: Create tables
-CREATE TABLE Users (
-	Id INT PRIMARY KEY IDENTITY,
-	Name NVARCHAR(100) NOT NULL,
-	SecondName NVARCHAR(100) NOT NULL
-);
+﻿-- Steps 1 and 2 are linked into one transaction, run it
+BEGIN TRANSACTION;
+BEGIN TRY
+	-- Step 1: Create tables, add users and categories
+	CREATE TABLE Users (
+		Id INT PRIMARY KEY IDENTITY,
+		Name NVARCHAR(100) NOT NULL,
+		SecondName NVARCHAR(100) NOT NULL
+	);
 
-CREATE TABLE Category (
-	Id INT PRIMARY KEY IDENTITY,
-	Description NVARCHAR(500) NOT NULL
-);
+	CREATE TABLE Category (
+		Id INT PRIMARY KEY IDENTITY,
+		Description NVARCHAR(500) NOT NULL
+	);
 
-CREATE TABLE Project (
-	Id INT PRIMARY KEY IDENTITY,
-	Name NVARCHAR(100) NOT NULL,
-	Description NVARCHAR(500) NOT NULL,
-	CreationDate DATETIME DEFAULT GETDATE() NOT NULL,
-	CreatorId INT NOT NULL,
-	CategoryId INT NOT NULL,
-	CONSTRAINT FK_Project_User FOREIGN KEY (CreatorId) REFERENCES Users(Id) ON DELETE CASCADE,
-	CONSTRAINT FK_Project_Category FOREIGN KEY (CategoryId) REFERENCES Category(Id) ON DELETE NO ACTION
-);
+	CREATE TABLE Project (
+		Id INT PRIMARY KEY IDENTITY,
+		Name NVARCHAR(100) NOT NULL,
+		Description NVARCHAR(500) NOT NULL,
+		CreationDate DATETIME DEFAULT GETDATE() NOT NULL,
+		CreatorId INT NOT NULL,
+		CategoryId INT NOT NULL,
+		CONSTRAINT FK_Project_User FOREIGN KEY (CreatorId) REFERENCES Users(Id) ON DELETE CASCADE,
+		CONSTRAINT FK_Project_Category FOREIGN KEY (CategoryId) REFERENCES Category(Id) ON DELETE NO ACTION
+	);
 
-CREATE TABLE Comment (
-	Id INT PRIMARY KEY IDENTITY,
-	Text NVARCHAR(MAX) NOT NULL,
-	Date DATETIME DEFAULT GETDATE() NOT NULL,
-	UserId INT NOT NULL,
-	ProjectId INT NOT NULL,
-	CONSTRAINT FK_Comment_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE NO ACTION,
-	CONSTRAINT FK_Comment_Project FOREIGN KEY (ProjectId) REFERENCES [Project](Id) ON DELETE CASCADE
-);
+	CREATE TABLE Comment (
+		Id INT PRIMARY KEY IDENTITY,
+		Text NVARCHAR(MAX) NOT NULL,
+		Date DATETIME DEFAULT GETDATE() NOT NULL,
+		UserId INT NOT NULL,
+		ProjectId INT NOT NULL,
+		CONSTRAINT FK_Comment_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE NO ACTION,
+		CONSTRAINT FK_Comment_Project FOREIGN KEY (ProjectId) REFERENCES [Project](Id) ON DELETE CASCADE
+	);
 
-CREATE TABLE Vote (
-	Id INT PRIMARY KEY IDENTITY,
-	UserId INT NOT NULL,
-	ProjectId INT NOT NULL,
-	CONSTRAINT UQ_Vote_User_Project UNIQUE(UserId, ProjectId),
-	CONSTRAINT FK_Vote_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE NO ACTION,
-	CONSTRAINT FK_Vote_Project FOREIGN KEY (ProjectId) REFERENCES Project(Id) ON DELETE CASCADE
-);
-GO
+	CREATE TABLE Vote (
+		Id INT PRIMARY KEY IDENTITY,
+		UserId INT NOT NULL,
+		ProjectId INT NOT NULL,
+		CONSTRAINT UQ_Vote_User_Project UNIQUE(UserId, ProjectId),
+		CONSTRAINT FK_Vote_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE NO ACTION,
+		CONSTRAINT FK_Vote_Project FOREIGN KEY (ProjectId) REFERENCES Project(Id) ON DELETE CASCADE
+	);
+	
+	-- Step 2: Add some users and categories
+	INSERT INTO Users (Name, SecondName)
+	VALUES
+		('John', 'Doe'),
+		('Alice', 'Smith'),
+		('Bob', 'Johnson');
+	INSERT INTO Category (Description) 
+	VALUES 
+		('Technology'),
+		('Education'),
+		('Health');
 
--- Step 2: Add some users and categories
-INSERT INTO Users (Name, SecondName)
-VALUES
-	('John', 'Doe'),
-	('Alice', 'Smith'),
-	('Bob', 'Johnson');
-INSERT INTO Category (Description) 
-VALUES 
-    ('Technology'),
-    ('Education'),
-    ('Health');
+	-- View User and Category tables
+	SELECT * From Users;
+	SELECT * From Category;
 
--- View User and Category tables
-SELECT * From Users;
-SELECT * From Category;
+	COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
 GO
 
 -- Step 3: CreateProject procedure
@@ -111,14 +120,14 @@ EXEC CreateProject
     @CreatorId = 2,
     @CategoryId = 2 -- Education
 GO
--- CreateProject 3 (shouldn't be create because of non-exist user)
+-- CreateProject 3 (shouldn't be created because of non-exist user)
 EXEC CreateProject 
     @Name = 'Online Learning Platform',
     @Description = 'An interactive platform for online education',
     @CreatorId = 999, -- User not exists
     @CategoryId = 2 -- Education
 GO
--- CreateProject 4 (shouldn't be create because of non-exist category)
+-- CreateProject 4 (shouldn't be created because of non-exist category)
 EXEC CreateProject 
     @Name = 'Online Learning Platform',
     @Description = 'An interactive platform for online education',
@@ -133,7 +142,7 @@ EXEC CreateProject
     @CategoryId = 3 -- Health
 GO
 
--- View Project table, there should be 3 projects
+-- View Project table
 select * from project
 GO
 
