@@ -45,7 +45,10 @@ namespace DataAccessLayer.Repositories
         public async Task DeleteAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
-            if (entity == null) return; 
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Entity with id {id} not found");
+            }; 
 
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();

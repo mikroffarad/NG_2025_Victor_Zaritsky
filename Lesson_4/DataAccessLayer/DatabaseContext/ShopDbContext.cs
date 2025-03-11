@@ -20,5 +20,6 @@ namespace DataAccessLayer.DatabaseContext
             base.OnModelCreating(modelBuilder);
         }
 
+
     }
 }
