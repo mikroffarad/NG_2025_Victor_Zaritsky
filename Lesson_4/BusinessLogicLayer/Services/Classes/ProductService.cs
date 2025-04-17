@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using BusinessLogicLayer.Models;
 using BusinessLogicLayer.Services.Interfaces;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Repositories.Interface;
@@ -12,10 +14,12 @@ namespace BusinessLogicLayer.Services.Classes
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(IProductRepository productRepository, IMapper mapper)
         {
             _productRepository = productRepository;
+            _mapper = mapper;
         }
 
         public async Task AddProductAsync(Product product)
@@ -28,14 +32,16 @@ namespace BusinessLogicLayer.Services.Classes
             await _productRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<ProductModel>> GetAllProductsAsync()
         {
-            return await _productRepository.GetAllAsync();
+            var products = await _productRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<ProductModel>>(products);
         }
 
-        public Task<Product> GetProductByIdAsync(int id)
+        public async Task<ProductModel> GetProductByIdAsync(int id)
         {
-            return _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdAsync(id);
+            return _mapper.Map<ProductModel>(product);
         }
 
         public async Task<IEnumerable<Product>> GetProductByPriceAsync(decimal MinPrice, decimal MaxPrice)

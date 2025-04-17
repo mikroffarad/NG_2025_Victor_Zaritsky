@@ -9,21 +9,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccessLayer.Configurations
 {
-    public class ProductConfiguration : IEntityTypeConfiguration<Product>
+    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
-        public void Configure(EntityTypeBuilder<Product> builder)
+        public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.HasKey(p => p.Id);
+            builder.HasKey(c => c.Id);
 
-            builder.Property(p => p.Name)
+            builder.Property(c => c.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(100);
 
-            builder.Property(p => p.Price)
-                .HasPrecision(18, 2);
+            builder.Property(c => c.Description)
+                .HasMaxLength(500);
 
-            builder.HasOne(p => p.Category)
-                .WithMany(c => c.Products)
+            builder.HasMany(c => c.Products)
+                .WithOne(p => p.Category)
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

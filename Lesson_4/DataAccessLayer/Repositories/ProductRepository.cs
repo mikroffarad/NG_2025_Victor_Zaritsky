@@ -14,9 +14,24 @@ namespace DataAccessLayer.Repositories
     {
         public ProductRepository(ShopDbContext context) : base(context) { }
 
+        public override async Task<IEnumerable<Product>> GetAllAsync()
+        {
+            return await _dbSet
+                .Include(p => p.Category)
+                .ToListAsync();
+        }
+
+        public override async Task<Product> GetByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         public async Task<IEnumerable<Product>> GetProductsByPrice(decimal MinPrice, decimal MaxPrice)
         {
             return await _dbSet
+                .Include(p => p.Category)
                 .Where(p => p.Price >= MinPrice && p.Price <= MaxPrice)
                 .ToListAsync();
         }
