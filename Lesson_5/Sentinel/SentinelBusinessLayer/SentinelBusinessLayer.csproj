@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SentinelAbstraction\SentinelAbstraction.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Enums\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HealthCareBL">
+      <HintPath>..\..\HealthCareBS\HealthCareBL\bin\Debug\net7.0\HealthCareBL.dll</HintPath>
+    </Reference>
+    <Reference Include="PetStoreBL">
+      <HintPath>..\..\PetStoreBS\PetStoreBL\bin\Debug\net7.0\PetStoreBL.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

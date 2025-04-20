@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.19" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PetStoreBL\PetStoreBL.csproj" />
+    <ProjectReference Include="..\PetStoreDal\PetStoreDal.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DAL-Core">
+      <HintPath>..\..\DAL-Core\DAL-Core\bin\Debug\net7.0\DAL-Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
