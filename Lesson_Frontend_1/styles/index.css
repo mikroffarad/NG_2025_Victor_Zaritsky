@@ -1,6 +1,5 @@
 @import 'reset.css';
 @import 'global.css';
-@import 'media.css';
 
 .banners__container {
     display: grid;
@@ -159,4 +158,96 @@
 
 .card-discover__image {
     flex-basis: 50%;
+}
+
+@media screen and (max-width: 992px) {
+    .banner-item__title {
+        font-size: 22px;
+    }
+
+    .banner-item__title::before {
+        font-size: 18px;
+    }
+
+    .card-discover__title {
+        font-size: 25px;
+    }
+
+    .card-discover__subtitle {
+        font-size: 20px;
+    }
+
+    .card-discover__text {
+        font-size: 18px;
+    }
+
+    .card-discover {
+        align-items: center;
+    }
+
+    .card-discover__image {
+        flex-shrink: 1;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .banners__container {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .banner-item__title {
+        font-size: 28px;
+    }
+
+    .banner-item__title::before {
+        font-size: 20px;
+    }
+
+    .choose__list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .choose__item {
+        max-width: 80%;
+    }
+
+    .card-discover {
+        flex-direction: column;
+        box-shadow: none;
+    }
+
+    .card-discover__info {
+        padding-top: 0;
+    }
+
+    .card-discover__subtitle {
+        font-size: 30px;
+    }
+
+    .card-discover__title {
+        font-size: 35px;
+    }
+
+    .card-discover__image {
+        order: 1;
+    }
+
+    .card-discover__info {
+        order: 2;
+    }
+}
+
+@media screen and (max-width: 392px) {
+
+    .banner-item__title {
+        font-size: 22px;
+    }
+
+    .banner-item__title::before {
+        font-size: 20px;
+    }
 }
