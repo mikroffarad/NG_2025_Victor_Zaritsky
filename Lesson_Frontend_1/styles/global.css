@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Akshar:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
+
+:root {
+    --text-color__base: #3D180F;
+    --text-color__white: #fdfdfd;
+    --background-color__yellow: #ffc236;
+    --background-color__red: #e01c1d;
+    --background-color__gray: gray;
+}
+
+body {
+    font-family: 'Akshar';
+    color: var(--text-color__base);
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+[class*="__container"] {
+    max-width: 1230px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 0 auto;
+}
+
+[class*="__text"] {
+    font-family: "Baloo 2";
+}
+
+.section {
+    padding-top: 50px;
+}
+
+.section:last-child {
+    padding-bottom: 50px;
+}

@@ -1,0 +1,162 @@
+@import 'reset.css';
+@import 'global.css';
+@import 'media.css';
+
+.banners__container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.banner-item {
+    position: relative;
+}
+
+.banner-item--span {
+    grid-row: span 2;
+}
+
+.banner-item--span .banner-item__title {
+    top: 5%;
+    left: 5%;
+}
+
+.banner-item__image {
+    border-radius: 10px;
+}
+
+.banner-item__title {
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    color: var(--text-color__white);
+    font-size: 28px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    width: 40%;
+}
+
+.banner-item__title::before {
+    display: block;
+    font-size: 20px;
+    content: "try it today";
+}
+
+.highlight {
+    max-width: fit-content;
+    padding: 5px 20px;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0 auto;
+    background-color: var(--background-color__yellow);
+    margin-bottom: 40px;
+}
+
+.choose__title {
+    font-weight: 700;
+    font-size: 50px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.choose__text {
+    text-align: center;
+    text-wrap: balance;
+}
+
+.choose__list {
+    display: flex;
+    list-style: none;
+    text-align: center;
+    justify-content: space-between;
+}
+
+.choose__item {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: 30%;
+}
+
+.choose-item__title {
+    text-transform: uppercase;
+    font-size: 25px;
+}
+
+.choose-item__text {
+    text-align: center;
+    text-wrap: balance;
+    margin-bottom: 20px;
+}
+
+.choose-item__link {
+    display: inline-block;
+    background: var(--background-color__red);
+    color: var(--text-color__white);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 20px;
+    padding: 10px 30px;
+}
+
+.discover {
+    padding-top: 100px;
+}
+
+.card-discover {
+    display: flex;
+    box-shadow: 61px 10px 52px -18px rgba(0, 0, 0, 0.75);
+    padding: 20px;
+    gap: 20px;
+}
+
+.card-discover__info {
+    flex-basis: 50%;
+    padding-top: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-discover__subtitle {
+    text-transform: uppercase;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--background-color__gray);
+}
+
+.card-discover__title {
+    text-transform: uppercase;
+    font-size: 50px;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.card-discover__text {
+    flex-grow: 1;
+    font-size: 20px;
+}
+
+.card-discover__sliders {
+    padding-top: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.slider {
+    display: block;
+    height: 15px;
+    width: 15px;
+    border-radius: 100%;
+    background-color: var(--background-color__gray);
+
+}
+
+.slider--active {
+    background-color: var(--background-color__yellow);
+}
+
+.card-discover__image {
+    flex-basis: 50%;
+}

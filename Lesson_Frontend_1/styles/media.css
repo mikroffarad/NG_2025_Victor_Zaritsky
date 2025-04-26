@@ -1,0 +1,90 @@
+@media screen and (max-width: 992px) {
+    .banner-item__title {
+        font-size: 22px !important;
+    }
+
+    .banner-item__title::before {
+        font-size: 18px !important;
+    }
+
+    .card-discover__title {
+        font-size: 25px !important;
+    }
+
+    .card-discover__subtitle {
+        font-size: 20px !important;
+    }
+
+    .card-discover__text {
+        font-size: 18px !important;
+    }
+
+    .card-discover {
+        align-items: center;
+    }
+
+    .card-discover__image {
+        flex-shrink: 1;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .banners__container {
+        display: flex !important;
+        align-items: center !important;
+        flex-direction: column !important;
+    }
+
+    .banner-item__title {
+        font-size: 28px !important;
+    }
+
+    .banner-item__title::before {
+        font-size: 20px !important;
+    }
+
+    .choose__list {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .choose__item {
+        max-width: 80% !important;
+    }
+
+    .card-discover {
+        flex-direction: column;
+    }
+
+    .card-discover__info {
+        padding-top: 0 !important;
+    }
+
+    .card-discover__subtitle {
+        font-size: 30px !important;
+    }
+
+    .card-discover__title {
+        font-size: 35px !important;
+    }
+
+    .card-discover__image {
+        order: 1;
+    }
+
+    .card-discover__info {
+        order: 2;
+    }
+}
+
+@media screen and (max-width: 392px) {
+
+    .banner-item__title {
+        font-size: 22px !important;
+    }
+
+    .banner-item__title::before {
+        font-size: 20px !important;
+    }
+}
