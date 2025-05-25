@@ -1,17 +1,26 @@
 const API_BASE = 'https://rickandmortyapi.com/api';
 
 export async function fetchRandomCharacters(count = 4) {
-    const resp = await fetch(`${API_BASE}/character`);
-    const { info: { count: total } } = await resp.json();
+    try {
+        const resp = await fetch(`${API_BASE}/character`);
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
 
-    const ids = new Set();
-    while (ids.size < count) {
-        ids.add(Math.floor(Math.random() * total) + 1);
+        const { info: { count: total } } = await resp.json();
+
+        const ids = new Set();
+        while (ids.size < count) {
+            ids.add(Math.floor(Math.random() * total) + 1);
+        }
+
+        const res = await fetch(`${API_BASE}/character/${[...ids]}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        const data = await res.json();
+        return Array.isArray(data) ? data : [data];
+    } catch (error) {
+        console.error('Error fetching characters:', error);
+        throw error;
     }
-
-    const res = await fetch(`${API_BASE}/character/${[...ids]}`);
-    const data = await res.json();
-    return Array.isArray(data) ? data : [data];
 }
 
 export async function getQuizCard(difficulty = 'easy') {
@@ -31,40 +40,58 @@ export async function getQuizCard(difficulty = 'easy') {
             break;
 
         case 'medium':
-            question = `What's the status of this ${correct.gender.toLowerCase()} character?`;
-            const allChars = await fetchRandomCharacters(20);
-            const statuses = [...new Set(allChars.map(c => c.status))];
-            options = statuses.slice(0, 4).map(status => ({
-                text: status,
-                isCorrect: status === correct.status
-            }));
-            // Fill with common statuses if needed
-            if (options.length < 4) {
-                const commonStatuses = ['Alive', 'Dead', 'unknown'];
-                while (options.length < 4) {
-                    const status = commonStatuses[Math.floor(Math.random() * commonStatuses.length)];
-                    if (!options.find(o => o.text === status)) {
-                        options.push({ text: status, isCorrect: status === correct.status });
-                    }
+            question = `What's the status of this character?`;
+            // Use predefined statuses to avoid API issues
+            const allStatuses = ['Alive', 'Dead', 'unknown'];
+            // Make sure correct answer is included
+            const correctStatus = correct.status;
+            options = [{ text: correctStatus, isCorrect: true }];
+
+            // Add other statuses as wrong answers
+            allStatuses.forEach(status => {
+                if (status !== correctStatus && options.length < 4) {
+                    options.push({ text: status, isCorrect: false });
                 }
+            });
+
+            // If we still need more options, add some variations
+            if (options.length < 4) {
+                const extraStatuses = ['Presumed dead', 'Missing'];
+                extraStatuses.forEach(status => {
+                    if (options.length < 4) {
+                        options.push({ text: status, isCorrect: false });
+                    }
+                });
             }
             break;
 
         case 'hard':
             question = "What species is this character?";
-            const speciesChars = await fetchRandomCharacters(20);
-            const allSpecies = [...new Set(speciesChars.map(c => c.species))];
-            options = allSpecies.slice(0, 4).map(species => ({
-                text: species,
-                isCorrect: species === correct.species
-            }));
+            // Use predefined species to avoid API complexity
+            const commonSpecies = ['Human', 'Alien', 'Humanoid', 'Robot', 'Animal', 'Disease', 'Cronenberg', 'Mythological Creature'];
+            const correctSpecies = correct.species;
+
+            options = [{ text: correctSpecies, isCorrect: true }];
+
+            // Add other species as wrong answers
+            const shuffledSpecies = commonSpecies.filter(s => s !== correctSpecies).sort(() => Math.random() - 0.5);
+
+            while (options.length < 4 && shuffledSpecies.length > 0) {
+                options.push({ text: shuffledSpecies.pop(), isCorrect: false });
+            }
+
+            // If still need more options, try to get from API
             if (options.length < 4) {
-                const commonSpecies = ['Human', 'Alien', 'Robot', 'Animal'];
-                while (options.length < 4) {
-                    const species = commonSpecies[Math.floor(Math.random() * commonSpecies.length)];
-                    if (!options.find(o => o.text === species)) {
-                        options.push({ text: species, isCorrect: species === correct.species });
+                try {
+                    const speciesChars = await fetchRandomCharacters(10);
+                    const uniqueSpecies = [...new Set(speciesChars.map(c => c.species))]
+                        .filter(s => s !== correctSpecies && !options.find(o => o.text === s));
+
+                    while (options.length < 4 && uniqueSpecies.length > 0) {
+                        options.push({ text: uniqueSpecies.pop(), isCorrect: false });
                     }
+                } catch (error) {
+                    console.warn('Could not fetch additional species, using fallback');
                 }
             }
             break;
