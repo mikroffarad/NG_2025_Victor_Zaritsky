@@ -1,16 +1,11 @@
-import QuizView from './components/QuizView.js';
-import ScoreBoard from './components/ScoreBoard.js';
+import QuizApp from './components/QuizApp.js';
 import { store } from './store.js';
 
 const app = document.getElementById('app');
 
-function render() {
-    app.innerHTML = '';
-    app.appendChild(QuizView());
-    app.appendChild(ScoreBoard(store));
-}
+// Initialize store
+store.load();
 
-// Listen to store changes
-document.addEventListener('scoreChange', render);
-
-render();
+// Create and start the quiz app
+const quizApp = new QuizApp(app, store);
+quizApp.init();
